@@ -1,0 +1,12 @@
+body{
+  width: 100vw;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", sans-serif;;
+}

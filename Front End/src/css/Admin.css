@@ -1,0 +1,15 @@
+.admin{
+    display: flex;
+    flex-direction: row
+}
+.admin .content{
+    width: calc(100% - 22% - 40px);
+    padding: 40px;
+}
+
+@media screen and (max-width: 900px) {
+    .admin{
+        flex-direction: column;
+    }
+    
+}
