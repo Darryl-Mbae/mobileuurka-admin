@@ -15,6 +15,38 @@ import ChangePassword from "../components/ChangePassword";
 // ✅ Backend API base URL
 const SERVER = import.meta.env.VITE_SERVER_URL;
 
+// ✅ Utility function for authenticated API calls
+const fetchWithAuth = async (url, options = {}) => {
+  const token = localStorage.getItem("access_token");
+  const defaultOptions = {
+    credentials: "include", // For cookies
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }), // Add token header
+      ...options.headers,
+    },
+  };
+  return fetch(url, { ...defaultOptions, ...options });
+};
+
+// ✅ Function to fetch current user data
+const fetchCurrentUser = async () => {
+  try {
+    const response = await fetchWithAuth(`${SERVER}/api/v1/users`);
+    const data = await response.json();
+    if (response.ok) {
+      console.log("User data:", data);
+      return data;
+    } else {
+      console.error("Failed to fetch user:", data);
+      throw new Error(data.message || "Failed to fetch user");
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+};
+
 // ✅ Wrapper to inject reCAPTCHA context
 export const AuthWrapper = () => (
   <GoogleReCaptchaProvider
@@ -125,40 +157,39 @@ const Auth = () => {
     }
   };
 
-// Function to check credentials and determine next step
-const sendOTP = async (email, password) => {
-  console.log(email, password); // Fixed typo: consolee -> console
-  try {
-    const response = await fetch(`${SERVER}/auth/check-credentials`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  // Function to check credentials and determine next step
+  const sendOTP = async (email, password) => {
+    console.log(email, password); // Fixed typo: consolee -> console
+    try {
+      const response = await fetch(`${SERVER}/auth/check-credentials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error || "Invalid credentials");
-    }
+      const data = await response.json();
 
-    console.log(data);
-    
-    // Check if user has default password BEFORE sending OTP
-    if (data.user && data.user.default === true) {
-      setUserHasDefaultPassword(true);
-      setRequiresPasswordChange(true);
+      if (!response.ok) {
+        throw new Error(data.error || "Invalid credentials");
+      }
+
+      console.log(data);
+
+      // Check if user has default password BEFORE sending OTP
+      if (data.user && data.user.default === true) {
+        setUserHasDefaultPassword(true);
+        setRequiresPasswordChange(true);
+        setLoading(false);
+        return;
+      }
+
+      // If not default password, proceed to send OTP
+      await sendOTPToUser(email, password);
+    } catch (error) {
+      setError(error.message);
       setLoading(false);
-      return;
     }
-
-    // If not default password, proceed to send OTP
-    await sendOTPToUser(email, password);
-  } catch (error) {
-    setError(error.message);
-    setLoading(false);
-  }
-};
-
+  };
 
   // Function to actually send OTP
   const sendOTPToUser = async (email, password) => {
@@ -279,7 +310,7 @@ const sendOTP = async (email, password) => {
     const response = await fetch(`${SERVER}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      credentials: "include", // Important for cookies
       body: JSON.stringify({ email, password, rememberMe }),
     });
 
@@ -291,18 +322,20 @@ const sendOTP = async (email, password) => {
     }
 
     const userData = await response.json();
-    console.log(userData);
+    console.log("Login successful:", userData);
 
- 
-   
-      // Normal login flow - redirect to dashboard
-      setLoginFormData({
-        email: "",
-        password: "",
-        rememberMe: false,
-      });
-      navigate("/");
-    
+    // Store token in localStorage as backup
+    if (userData.token) {
+      localStorage.setItem("access_token", userData.token);
+    }
+
+    // Normal login flow - redirect to dashboard
+    setLoginFormData({
+      email: "",
+      password: "",
+      rememberMe: false,
+    });
+    navigate("/");
 
     return userData;
   };
