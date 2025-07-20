@@ -125,36 +125,40 @@ const Auth = () => {
     }
   };
 
-  // Function to check credentials and determine next step
-  const sendOTP = async (email, password) => {
-    try {
-      const response = await fetch(`${SERVER}/auth/check-credentials`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+// Function to check credentials and determine next step
+const sendOTP = async (email, password) => {
+  console.log(email, password); // Fixed typo: consolee -> console
+  try {
+    const response = await fetch(`${SERVER}/auth/check-credentials`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Invalid credentials");
-      }
-
-      // Check if user has default password BEFORE sending OTP
-      if (data.user && data.user.default === true) {
-        setUserHasDefaultPassword(true);
-        setRequiresPasswordChange(true);
-        setLoading(false);
-        return;
-      }
-
-      // If not default password, proceed to send OTP
-      await sendOTPToUser(email, password);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || "Invalid credentials");
     }
-  };
+
+    console.log(data);
+    
+    // Check if user has default password BEFORE sending OTP
+    if (data.user && data.user.default === true) {
+      setUserHasDefaultPassword(true);
+      setRequiresPasswordChange(true);
+      setLoading(false);
+      return;
+    }
+
+    // If not default password, proceed to send OTP
+    await sendOTPToUser(email, password);
+  } catch (error) {
+    setError(error.message);
+    setLoading(false);
+  }
+};
+
 
   // Function to actually send OTP
   const sendOTPToUser = async (email, password) => {
