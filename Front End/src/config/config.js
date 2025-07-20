@@ -1,4 +1,4 @@
-import logo from "../assets/logo.png"; // ✅ No curly braces
+import logo from "../assets/images/logo.png"; // ✅ No curly braces
 
 // config.js
 const CompanyConfig = {

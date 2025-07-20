@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import './SideBar.css';
-import CompanyConfig from '../../config/config.js';
-import '../../css/hamburger.css';
+import { useState } from "react";
+import "../css/SideBar.css";
+import CompanyConfig from "../config/config.js";
+import "../css/hamburger.css";
 
-import { MdOutlineSpaceDashboard } from 'react-icons/md';
-import { HiOutlineUserGroup, HiOutlineUser } from 'react-icons/hi';
-import { HiOutlineBuildingOffice } from 'react-icons/hi2'; // for hospital
-import { IoSettingsOutline } from 'react-icons/io5';
-import { FiBell } from 'react-icons/fi';
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { HiOutlineUserGroup, HiOutlineUser } from "react-icons/hi";
+import { HiOutlineBuildingOffice } from "react-icons/hi2"; // for hospital
+import { IoSettingsOutline } from "react-icons/io5";
+import { FiBell } from "react-icons/fi";
 
 const SideBar = ({ activeItem, setActiveItem }) => {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
   const handleClick = (name) => {
@@ -19,16 +19,16 @@ const SideBar = ({ activeItem, setActiveItem }) => {
   };
 
   const ClientItems = [
-    { name: 'Dashboard', icon: <MdOutlineSpaceDashboard /> },
-    { name: 'Obgyns', icon: <HiOutlineUserGroup /> },
-    { name: 'Hospitals', icon: <HiOutlineBuildingOffice /> },
-    { name: 'Patients', icon: <HiOutlineUser /> },
+    { name: "Dashboard", icon: <MdOutlineSpaceDashboard /> },
+    { name: "Tenants", icon: <HiOutlineBuildingOffice /> },
+    { name: "Organisations", icon: <HiOutlineUserGroup /> },
+    { name: "Users", icon: <HiOutlineUserGroup /> },
+    { name: "Patients", icon: <HiOutlineUser /> },
   ];
 
-
   const activityItems = [
-    { name: 'Settings', icon: <IoSettingsOutline /> },
-    { name: 'Alerts', icon: <FiBell />, showBadge: true },
+    { name: "Settings", icon: <IoSettingsOutline /> },
+    { name: "Alerts", icon: <FiBell />, showBadge: true },
   ];
 
   return (
@@ -39,7 +39,9 @@ const SideBar = ({ activeItem, setActiveItem }) => {
         </div>
         <div className="name">{CompanyConfig.name}</div>
         <div
-          className={`hamburger hamburger--collapse ${isSidebarOpen ? 'is-active' : ''}`}
+          className={`hamburger hamburger--collapse ${
+            isSidebarOpen ? "is-active" : ""
+          }`}
           onClick={toggleSidebar}
         >
           <span className="hamburger-box">
@@ -48,13 +50,13 @@ const SideBar = ({ activeItem, setActiveItem }) => {
         </div>
       </div>
 
-      <div className={`navigation ${!isSidebarOpen ? 'open' : ''}`}>
+      <div className={`navigation ${!isSidebarOpen ? "open" : ""}`}>
         <div className="category">App</div>
         <ul>
           {ClientItems.map((item) => (
             <li
               key={item.name}
-              className={activeItem === item.name ? 'active' : ''}
+              className={activeItem === item.name ? "active" : ""}
               onClick={() => handleClick(item.name)}
             >
               <div className="icon">{item.icon}</div>
@@ -69,7 +71,7 @@ const SideBar = ({ activeItem, setActiveItem }) => {
           {activityItems.map((item) => (
             <li
               key={item.name}
-              className={activeItem === item.name ? 'active' : ''}
+              className={activeItem === item.name ? "active" : ""}
               onClick={() => handleClick(item.name)}
             >
               <div className="icon">{item.icon}</div>
